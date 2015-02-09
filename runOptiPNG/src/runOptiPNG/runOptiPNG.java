@@ -14,6 +14,7 @@ import javax.swing.UIManager;
 import javax.swing.SwingConstants;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 
@@ -123,42 +124,47 @@ public class runOptiPNG {
 		frmRunOptiPNG.getContentPane().add(txtBox);
 		txtBox.setColumns(10);
 
-		JRadioButton rdbtnNewRadioButton = new JRadioButton("A single file");
-		rdbtnNewRadioButton.addActionListener(new ActionListener() {
+		final JRadioButton rdbtnSingleFile = new JRadioButton("A single file");
+		rdbtnSingleFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				promptForFile();
+				promptForFile(false);
 			}
 		});
-		rdbtnNewRadioButton.setBackground(new Color(255, 250, 250));
-		rdbtnNewRadioButton.setMnemonic('s');
-		rdbtnNewRadioButton.setIconTextGap(8);
-		buttonGroup.add(rdbtnNewRadioButton);
-		rdbtnNewRadioButton.setBounds(30, 40, 109, 23);
-		frmRunOptiPNG.getContentPane().add(rdbtnNewRadioButton);
+		rdbtnSingleFile.setBackground(new Color(255, 250, 250));
+		rdbtnSingleFile.setMnemonic('s');
+		rdbtnSingleFile.setIconTextGap(8);
+		buttonGroup.add(rdbtnSingleFile);
+		rdbtnSingleFile.setBounds(30, 40, 109, 23);
+		frmRunOptiPNG.getContentPane().add(rdbtnSingleFile);
 
-		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton(
+		final JRadioButton rdbtnChooseDirectory = new JRadioButton(
 				"All PNGs and GIFs in a directory");
-		rdbtnNewRadioButton_1.setBackground(new Color(255, 250, 250));
-		rdbtnNewRadioButton_1.setMnemonic('d');
-		rdbtnNewRadioButton_1.setIconTextGap(8);
-		buttonGroup.add(rdbtnNewRadioButton_1);
-		rdbtnNewRadioButton_1.setBounds(30, 66, 308, 23);
-		frmRunOptiPNG.getContentPane().add(rdbtnNewRadioButton_1);
+		rdbtnChooseDirectory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				promptForFile(true);
+			}
+		});
+		rdbtnChooseDirectory.setBackground(new Color(255, 250, 250));
+		rdbtnChooseDirectory.setMnemonic('d');
+		rdbtnChooseDirectory.setIconTextGap(8);
+		buttonGroup.add(rdbtnChooseDirectory);
+		rdbtnChooseDirectory.setBounds(30, 66, 308, 23);
+		frmRunOptiPNG.getContentPane().add(rdbtnChooseDirectory);
 
-		JRadioButton rdbtnNewRadioButton_2 = new JRadioButton(
+		final JRadioButton rdbtnCurrentDirectory = new JRadioButton(
 				"All PNGs and GIFs in the current directory");
-		rdbtnNewRadioButton_2.addActionListener(new ActionListener() {
+		rdbtnCurrentDirectory.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				txtBox.setText(System.getProperty("user.dir") );
 			}
 		});
-		rdbtnNewRadioButton_2.setBackground(new Color(255, 250, 250));
-		rdbtnNewRadioButton_2.setMnemonic('u');
-		rdbtnNewRadioButton_2.setIconTextGap(8);
-		rdbtnNewRadioButton_2.setSelected(true);
-		buttonGroup.add(rdbtnNewRadioButton_2);
-		rdbtnNewRadioButton_2.setBounds(30, 92, 300, 23);
-		frmRunOptiPNG.getContentPane().add(rdbtnNewRadioButton_2);
+		rdbtnCurrentDirectory.setBackground(new Color(255, 250, 250));
+		rdbtnCurrentDirectory.setMnemonic('u');
+		rdbtnCurrentDirectory.setIconTextGap(8);
+		rdbtnCurrentDirectory.setSelected(true);
+		buttonGroup.add(rdbtnCurrentDirectory);
+		rdbtnCurrentDirectory.setBounds(30, 92, 300, 23);
+		frmRunOptiPNG.getContentPane().add(rdbtnCurrentDirectory);
 
 		JLabel lblRunOptipngOn = new JLabel("Optimize:");
 		lblRunOptipngOn.setBounds(30, 19, 176, 14);
@@ -169,14 +175,40 @@ public class runOptiPNG {
 		// **********RUN THE CONVERSION PROCESS **************
 		JButton btnRun = new JButton("OK");
 		btnRun.addActionListener(new ActionListener() {			
-			public void actionPerformed(ActionEvent arg0) {				
-				String fileNm = txtBox.getText();
+			public void actionPerformed(ActionEvent arg0) {		
+				if(rdbtnSingleFile.isSelected()) {
+					System.out.println("SELECTED: single file");
+				} else if(rdbtnChooseDirectory.isSelected()) {
+					System.out.println("SELECTED: choose a dir");
+				} else {
+					System.out.println("SELECTED: current dir");
+				}
+				
+
+				
+				String fName = txtBox.getText();
+				String fType = "d";  //Types: d=directory (non-recursive), f=single file, r=directory and subdirectories (recursion)
+				if(rdbtnSingleFile.isSelected()) {
+					fType = "f";
+				} else {
+					//if recursion selected then fType = "r"; 
+				}
+				
 				OutputAndResult outputAndExitcode = new OutputAndResult("", 1);
+				
+				//optipng -nc -nb -backup -o7   
+				//TODO: change the -o7 to user selection of 0, 1 or 7
+				//need to add a 3rd argument to the getOutputAndResult method for the compressionlevel
+				
 				try {
-					outputAndExitcode = ExternalOperation.getOutputAndResult(progName, fileNm);
+					outputAndExitcode = ExternalOperation.getOutputAndResult(progName, fType, fName);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+				
+				
+				
+				
 				System.out.println(outputAndExitcode.getOutput() + "\nExit code: " + outputAndExitcode.getResult());
 				if (outputAndExitcode.getResult() !=0 ) {
 					ErrorDialog.showError(outputAndExitcode.getOutput(), "error");													
@@ -201,8 +233,8 @@ public class runOptiPNG {
 		frmRunOptiPNG.getContentPane().add(btnCancel);
 		frmRunOptiPNG.getContentPane().setFocusTraversalPolicy(
 				new FocusTraversalOnArray(new Component[] { btnRun, btnCancel,
-						rdbtnNewRadioButton, rdbtnNewRadioButton_1,
-						rdbtnNewRadioButton_2, txtBox }));
+						rdbtnSingleFile, rdbtnChooseDirectory,
+						rdbtnCurrentDirectory, txtBox }));
 
 		InitialFocusSetter.setInitialFocus(frmRunOptiPNG, btnRun);
 
@@ -290,23 +322,33 @@ public class runOptiPNG {
 	
 	
 	
-	private void promptForFile(){
+	private void promptForFile(boolean filesAndDirs){
 		// parent component of the dialog:
 		JFrame parentFrame = new JFrame();
 		
 		setupUIManager(); //Change the ugly tooltip for the Cancel button
 		
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Choose a file to process");   		
-		fileChooser.setApproveButtonToolTipText("Choose what you want to process");
+		FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG files only", "png");
+		FileNameExtensionFilter pngGifFilter = new FileNameExtensionFilter("PNGs and GIFs", "png", "gif");
+		fileChooser.addChoosableFileFilter(pngFilter);
+		fileChooser.addChoosableFileFilter(pngGifFilter);
+		fileChooser.setFileFilter(pngFilter);
+		
+		fileChooser.setApproveButtonToolTipText("Choose what you want to process");				
 	    // Note: fileChooser.setApproveButtonMnemonic('e');  has no effect
-	    
+
+		fileChooser.setDialogTitle("Choose a file to process");   		
+		if (filesAndDirs) {
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			fileChooser.setDialogTitle("Choose a directory to process"); 
+		}
 		int userSelection = fileChooser.showDialog(parentFrame, "Select");
 		 
 		if (userSelection == JFileChooser.APPROVE_OPTION) {
 		    File fileToProcess = fileChooser.getSelectedFile();
 		    String filePath = fileToProcess.getAbsolutePath();
-		    System.out.println("Chosen file: " + filePath); //CONSOLE OUTPUT
+		    System.out.println("Chosen file or directory: " + filePath); //CONSOLE OUTPUT
 		    txtBox.setText(filePath);
 		}
 	}
