@@ -261,6 +261,7 @@ public class OptiPngRunner {
 
 	
 	
+	
 	//TODO: CURRENTLY I JUST DUMPED THIS IN HERE ... NEED TO DO SOMETHING WITH IT ...............
     private void runExternalProg() throws IOException {
     	String prog = "optipng.exe";
