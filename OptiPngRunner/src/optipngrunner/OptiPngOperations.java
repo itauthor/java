@@ -10,9 +10,9 @@ import org.apache.commons.lang3.SystemUtils;
 
 
 // Try running the program and capture its exit code
-public class ExternalOperation {
+public class OptiPngOperations {
 	
-	public static int getExitCode(String progName, String progFlag) throws IOException {
+	public static int checkItRuns(String progName, String progFlag) throws IOException {
 		int exitValue = 1;  //Assume there was a problem		
 		String[] cmd;		
 		if (SystemUtils.IS_OS_WINDOWS) {
@@ -30,7 +30,7 @@ public class ExternalOperation {
 	    return exitValue;
 	}
 	
-	public static OutputAndResult getOutputAndResult(String progName, String targetType, String target) throws IOException {		
+	public static OutputAndResult run(String progName, String targetType, String target) throws IOException {		
 		if (targetType == "d") {
 			target += "\\*.png";  //TODO: Change this for Linux
 		}

@@ -2,8 +2,8 @@ public class RecursiveFilteredDirContentsLister {
 	
 	public static void main(String[] args) {
 		// Directory to parse, extension to filter on, and max in output list:
-		String path = "C:\\Alistair\\family\\";
-		String ext = "txt";
+		String path = "C:\\Temp\\images1 - Copy (4)";
+		String ext = "png";
 		int maxToShow = 15;
 
 		int retVal = FileList.getFilePaths(path, ext);	

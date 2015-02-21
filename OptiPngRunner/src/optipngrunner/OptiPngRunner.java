@@ -49,7 +49,7 @@ public class OptiPngRunner {
 	public static void main(String[] args) {	
 		int exitCode = 1; //Assume there was a problem
 		try {
-			exitCode = ExternalOperation.getExitCode(progName, progCheckParam);
+			exitCode = OptiPngOperations.checkItRuns(progName, progCheckParam);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -199,7 +199,7 @@ public class OptiPngRunner {
 				//need to add a 3rd argument to the getOutputAndResult method for the compressionlevel
 				
 				try {
-					outputAndExitcode = ExternalOperation.getOutputAndResult(progName, fType, fName);
+					outputAndExitcode = OptiPngOperations.getOutputAndResult(progName, fType, fName);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
